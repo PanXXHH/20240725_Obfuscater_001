@@ -108,44 +108,21 @@ def obfuscate_folder_cmd(deobfuscate: bool | None, noback: bool | None):
             except Exception as e:
                 print(f"操作 {filename} 时出错：{e}")
 
-    for root, dirs, files in tqdm(os.walk(global_targetpath), desc="正在遍历文件夹"):  # 遍历文件夹
-        for filename in tqdm(files, desc="处理文件"):
-            file_path = os.path.join(root, filename)
-            if deobfuscate: # 解密
-                if file_path.endswith(".obf001"):
-                    try:
-                        _deobfuscate_header(input_file=file_path)
-                        # print(f"文件 {filename} 已解混淆。")
-                    except Exception as e:
-                        print(f"解混淆文件 {filename} 时发生错误：{e}")
-                        input("按任意键继续...")
-            else: # 加密
-                if file_path.endswith(".obf001"):
-                    print(f"跳过已混淆文件 {filename}")
-                    continue
-
-                if file_path.endswith(".headerbak"):
-                    print(f"跳过头部备份文件 {filename}")
-                    continue
-
-                try:
-                    _obfuscate_header(input_file=file_path, noback=noback)
-                    # print(f"文件 {filename} 已混淆。")
-                except Exception as e:
-                    print(f"混淆文件 {filename} 时发生错误：{e}")
-                    input("按任意键继续...")
-
-    # for root, dirs, files in os.walk(global_targetpath):  # 遍历文件夹
-    #     for filename in files:
+    # for root, dirs, files in tqdm(os.walk(global_targetpath), desc="正在遍历文件夹"):  # 遍历文件夹
+    #     for filename in tqdm(files, desc="处理文件"):
     #         file_path = os.path.join(root, filename)
-    #         if deobfuscate:
+    #         if deobfuscate: # 解密
     #             if file_path.endswith(".obf001"):
     #                 try:
     #                     _deobfuscate_header(input_file=file_path)
     #                     # print(f"文件 {filename} 已解混淆。")
     #                 except Exception as e:
     #                     print(f"解混淆文件 {filename} 时发生错误：{e}")
-    #         else:
+    #                     input("按任意键继续...")
+    #         else: # 加密
+    #             if file_path.endswith(".obf001"):
+    #                 print(f"跳过已混淆文件 {filename}")
+    #                 continue
 
     #             if file_path.endswith(".headerbak"):
     #                 print(f"跳过头部备份文件 {filename}")
@@ -156,6 +133,7 @@ def obfuscate_folder_cmd(deobfuscate: bool | None, noback: bool | None):
     #                 # print(f"文件 {filename} 已混淆。")
     #             except Exception as e:
     #                 print(f"混淆文件 {filename} 时发生错误：{e}")
+    #                 input("按任意键继续...")
 
 
 def main(command=None, targetpath=None, all=None, deobfuscate=None, de=None, noback=None):
