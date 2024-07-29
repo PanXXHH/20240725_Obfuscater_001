@@ -3,6 +3,7 @@
     001: 优化进度显示
     002: fix: obfuscate_folder_cmd重复调用
     003: noback改为headback，默认不生成备份
+    004: 优化提示
 
 
 2024-07-25:

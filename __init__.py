@@ -21,6 +21,7 @@ def _obfuscate_header(input_file: str, headback: bool = False, minimum_size: int
     backup_file = input_file + ".headerbak"
     if os.path.exists(backup_file):
         print("错误: 检测到头部备份文件存在，无法继续执行。请确认上次操作是否成功，或手动删除备份文件。")
+        input("按任意键结束...")
         sys.exit(1)
 
     print(f"正在从 {input_file} 读取数据中...")
@@ -40,7 +41,10 @@ def _obfuscate_header(input_file: str, headback: bool = False, minimum_size: int
 
     output_file = input_file + ".obf001"
     os.rename(input_file, output_file)
-    print("混淆完成。如果操作失败，请使用备份文件恢复数据。")
+    if headback:
+        print("混淆完成。如果操作失败，请手动合并头部备份文件进行恢复数据。")
+    else:
+        print("混淆完成。")
 
 
 def _deobfuscate_header(input_file: str, minimum_size: int = 1024*1024):
