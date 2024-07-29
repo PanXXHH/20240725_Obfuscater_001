@@ -11,7 +11,7 @@ def bit_flip_bytes(bytes_data):
     return bytes(byte ^ 0xFF for byte in bytes_data)
 
 
-def _obfuscate_header(input_file: str, noback: bool = False, minimum_size: int = 1024*1024):
+def _obfuscate_header(input_file: str, headback: bool = False, minimum_size: int = 1024*1024):
     # 计算头部大小为文件的1%，但不少于1MB
     file_size = os.path.getsize(input_file)
     encrypt_size = max(int(file_size * 0.01), minimum_size)
@@ -26,12 +26,12 @@ def _obfuscate_header(input_file: str, noback: bool = False, minimum_size: int =
     print(f"正在从 {input_file} 读取数据中...")
     with open(input_file, 'rb+') as file:
         header = file.read(encrypt_size)  # 读取需要混淆的头部数据
-        if noback:
-            print(f"不需要创建头部备份！")
-        else:
+        if headback:
             print(f"正在创建头部的备份...")
             with open(backup_file, 'wb') as backup:
                 backup.write(header)  # 备份头部数据
+        else:
+            print(f"不需要创建头部备份！")
 
         print(f"正在混淆 {encrypt_size} 字节的数据...")
         obfuscated_header = bit_flip_bytes(header)
@@ -74,21 +74,21 @@ def _deobfuscate_header(input_file: str, minimum_size: int = 1024*1024):
         os.remove(backup_file)
 
 
-def default_cmd(input_file: str | None, deobfuscate: bool | None, noback: bool | None):
+def default_cmd(input_file: str | None, deobfuscate: bool | None, headback: bool | None):
     input_file = input_file if input_file is not None else input("请输入文件名：")
     deobfuscate = deobfuscate if deobfuscate is not None else input_file.endswith(
         ".obf001")
-    noback = noback if noback is not None else False
+    headback = headback if headback is not None else False
 
     if deobfuscate:
         _deobfuscate_header(input_file=input_file)
     else:
-        _obfuscate_header(input_file=input_file, noback=noback)
+        _obfuscate_header(input_file=input_file, headback=headback)
 
 
-def obfuscate_folder_cmd(deobfuscate: bool | None, noback: bool | None):
+def obfuscate_folder_cmd(deobfuscate: bool | None, headback: bool | None):
     deobfuscate = deobfuscate if deobfuscate is not None else False
-    noback = noback if noback is not None else False
+    headback = headback if headback is not None else False
 
     for root, dirs, files in tqdm(os.walk(global_targetpath), desc="正在遍历文件夹"):
         for filename in tqdm(files, desc="处理文件"):
@@ -104,46 +104,19 @@ def obfuscate_folder_cmd(deobfuscate: bool | None, noback: bool | None):
                         print(f"跳过已混淆文件 {filename}")
                         continue
                     if not file_path.endswith(".obf001"):
-                        _obfuscate_header(file_path, noback)
+                        _obfuscate_header(file_path, headback)
             except Exception as e:
                 print(f"操作 {filename} 时出错：{e}")
 
-    # for root, dirs, files in tqdm(os.walk(global_targetpath), desc="正在遍历文件夹"):  # 遍历文件夹
-    #     for filename in tqdm(files, desc="处理文件"):
-    #         file_path = os.path.join(root, filename)
-    #         if deobfuscate: # 解密
-    #             if file_path.endswith(".obf001"):
-    #                 try:
-    #                     _deobfuscate_header(input_file=file_path)
-    #                     # print(f"文件 {filename} 已解混淆。")
-    #                 except Exception as e:
-    #                     print(f"解混淆文件 {filename} 时发生错误：{e}")
-    #                     input("按任意键继续...")
-    #         else: # 加密
-    #             if file_path.endswith(".obf001"):
-    #                 print(f"跳过已混淆文件 {filename}")
-    #                 continue
 
-    #             if file_path.endswith(".headerbak"):
-    #                 print(f"跳过头部备份文件 {filename}")
-    #                 continue
-
-    #             try:
-    #                 _obfuscate_header(input_file=file_path, noback=noback)
-    #                 # print(f"文件 {filename} 已混淆。")
-    #             except Exception as e:
-    #                 print(f"混淆文件 {filename} 时发生错误：{e}")
-    #                 input("按任意键继续...")
-
-
-def main(command=None, targetpath=None, all=None, deobfuscate=None, de=None, noback=None):
+def main(command=None, targetpath=None, all=None, deobfuscate=None, de=None, headback=None):
     global global_targetpath
     global_targetpath = targetpath or '.'
     if all is True:
-        obfuscate_folder_cmd(deobfuscate=deobfuscate or de, noback=noback)
+        obfuscate_folder_cmd(deobfuscate=deobfuscate or de, headback=headback)
     else:
         default_cmd(input_file=command,
-                    deobfuscate=deobfuscate or de,noback=noback)
+                    deobfuscate=deobfuscate or de,headback=headback)
 
 
 if __name__ == "__main__":
